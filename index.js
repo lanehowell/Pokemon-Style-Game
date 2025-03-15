@@ -1,15 +1,21 @@
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
-canvas.width = 1024
-canvas.height = 576
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+window.addEventListener('resize', ()=>{
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+
+})
+
+let offset = {x: -375, y: -505}
 
 const collisionsMap = []
 for(let i = 0; i < collisions.length; i+=70){ // iterator should be the width of your map in tiles
     collisionsMap.push(collisions.slice(i, i + 70))
 }
-
-const offset = {x: -738, y: -645}
 
 const boundaries = []
 collisionsMap.forEach((row, i)=>{
@@ -59,18 +65,10 @@ const foreground = new Sprite({
 })
 
 const keys = {
-    w: {
-        pressed: false
-    },
-    a: {
-        pressed: false
-    },
-    s: {
-        pressed: false
-    },
-    d: {
-        pressed: false
-    }
+    w: { pressed: false },
+    a: { pressed: false },
+    s: { pressed: false },
+    d: { pressed: false },
 }
 
 const movables = [background, ...boundaries, foreground]
@@ -178,5 +176,4 @@ window.addEventListener('keyup', (e)=>{
         keys.d.pressed = false
     }
 })
-
 
