@@ -4,17 +4,16 @@ const c = canvas.getContext('2d')
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
-window.addEventListener('resize', ()=>{
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-
-})
-
 let offset = {x: -375, y: -505}
 
 const collisionsMap = []
 for(let i = 0; i < collisions.length; i+=70){ // iterator should be the width of your map in tiles
     collisionsMap.push(collisions.slice(i, i + 70))
+}
+
+const battleZonesMap = []
+for(let i = 0; i < battleZonesData.length; i+=70){ // iterator should be the width of your map in tiles
+    battleZonesMap.push(battleZonesData.slice(i, i + 70))
 }
 
 const boundaries = []
@@ -25,6 +24,17 @@ collisionsMap.forEach((row, i)=>{
         }
     })
 })
+
+const battleZones = []
+battleZonesMap.forEach((row, i)=>{
+    row.forEach((symbol, j)=>{
+        if(symbol === 1025){
+            battleZones.push(new Boundary({position:{x: j*Boundary.width + offset.x, y: i*Boundary.height + offset.y}}))
+        }
+    })
+})
+
+console.log(battleZones)
 
 // Create Map
 const image = new Image()
@@ -71,7 +81,7 @@ const keys = {
     d: { pressed: false },
 }
 
-const movables = [background, ...boundaries, foreground]
+const movables = [background, ...boundaries, foreground, ...battleZones]
 
 function rectangularCollision({rectangle1, rectangle2}){
     return(rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
@@ -86,8 +96,21 @@ function animate(){
     boundaries.forEach(boundary => {
         boundary.draw()
     })
+    battleZones.forEach(battleZone =>{
+        battleZone.draw()
+    })
     player.draw()
     foreground.draw()
+
+    if(keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed){
+        for(let i = 0; i<battleZones.length; i++){
+            const battleZone = battleZones[i]
+            if(rectangularCollision({rectangle1: player, rectangle2: battleZone})){
+                console.log('in battlezone')
+                break
+            }
+        }
+    }
 
     let moving = true
     player.moving = false
